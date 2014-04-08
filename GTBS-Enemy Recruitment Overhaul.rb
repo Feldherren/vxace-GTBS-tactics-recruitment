@@ -34,6 +34,12 @@ class Scene_Battle_TBS < Scene_Base
     # fix new actor's name
     $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].name = battler.name()
     # get enemy level
+    targetLevel = battler.level
+    currentLevel = $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].level
+    while currentLevel < targetLevel  do
+      $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].level_up()
+      currentLevel +=1
+    end
     # get weapon, armour tags from original enemy
     #$game_actors[id].change_equip_by_id(slot_id, item_id) # for changing equipment
   end
