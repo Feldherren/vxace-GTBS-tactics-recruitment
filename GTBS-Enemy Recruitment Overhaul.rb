@@ -17,8 +17,8 @@ class Scene_Battle_TBS < Scene_Base
       #$game_party.add_actor(id)
       # NEW
       $game_variables[Recruitment::NEW_ACTOR_VAR]=$game_actors[id,true]
-      $game_party.add_actor($game_variables[Recruitment::NEW_ACTOR_VAR])
       customise_clone(id, battler)
+      $game_party.add_actor($game_variables[Recruitment::NEW_ACTOR_VAR])
       # END NEW STUFF
     elsif (battler.actor? && !battler.death_state? && battler.team != Battler_Actor &&
                                 !battler.states.include?(GTBS::CHARM_ID))
@@ -31,10 +31,8 @@ class Scene_Battle_TBS < Scene_Base
   end
   
   def customise_clone(id, battler)
-    # get enemy name
-    name = battler.name()
-    puts name
-    $game_actors[Recruitment::NEW_ACTOR_VAR].name = name
+    # fix new actor's name
+    $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].name = battler.name()
     # get enemy level
     # get weapon, armour tags from original enemy
     #$game_actors[id].change_equip_by_id(slot_id, item_id) # for changing equipment
