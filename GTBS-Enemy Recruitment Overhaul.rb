@@ -5,7 +5,7 @@ module Recruitment
   # Variable to store ID of new clone in whilst it's customised.
   NEW_ACTOR_VAR = 1
   
-  MATCH_EQUIP = /<recruit\s*equipment\s*:\s*(\d*),\s*(\d*)>/i
+  MATCH_EQUIP = /(<recruit\s*equipment\s*:\s*(\d*),\s*(\d*)>),?+/i # whilst Rubular says this should pick up more than one match, it doesn't here.
   MATCH_PARAMS = /^<recruit (MHP|MMP|ATK|DEF|MAT|MDF|AGI|LUK)\s*:\s*(\+|\-)\s*([\d]*)>/i
 end
 
@@ -44,26 +44,21 @@ class Scene_Battle_TBS < Scene_Base
       currentLevel +=1
     end
     
-    $data_enemies[battler.enemy_id].note.split(/[\r\n]+/).each { |line|
-      case line
-      #---
-        when (match = line.match(Recruitment::MATCH_EQUIP))
-          puts match[1].to_s + ", " + match[2].to_s
-          if match[1].to_i == 0
-            # equipment is a weapon
-            $game_party.gain_item($data_weapons[match[2].to_i], 1)
-          else
-            # equipment is something else
-            $game_party.gain_item($data_armors[match[2].to_i], 1)
-          end
-          #$game_actors[id].change_equip_by_id(slot_id, item_id) # for changing equipment
-          $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].change_equip_by_id(match[1].to_i, match[2].to_i)
-        end
-      #---
-    } # self.note.split
-    
     # get weapon, armour tags from original enemy
-    
+    match = $data_enemies[battler.enemy_id].note.match(Recruitment::MATCH_EQUIP)
+    $i = 0
+    while $i <= match.length do
+      if match[$i][1].to_i == 0
+        # equipment is a weapon
+        $game_party.gain_item($data_weapons[match[$i][2].to_i], 1)
+      else
+        # equipment is something else
+        $game_party.gain_item($data_armors[match[$i][2].to_i], 1)
+      end
+      #$game_actors[id].change_equip_by_id(slot_id, item_id) # for changing equipment
+      $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].change_equip_by_id(match[$i][1].to_i, match[$i][2].to_i)
+      $i +=1
+    end
     # get stat tags from original enemy
   end
 end
