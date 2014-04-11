@@ -44,10 +44,11 @@ class Scene_Battle_TBS < Scene_Base
       currentLevel +=1
     end
     
-    self.note.split(/[\r\n]+/).each { |line|
+    $data_enemies[battler.enemy_id].note.split(/[\r\n]+/).each { |line|
       case line
       #---
-        if (match = line.match(MATCH_EQUIP))
+        when (match = line.match(Recruitment::MATCH_EQUIP))
+          puts match[1].to_s + ", " + match[2].to_s
           if match[1].to_i == 0
             # equipment is a weapon
             $game_party.gain_item($data_weapons[match[2].to_i], 1)
@@ -59,7 +60,6 @@ class Scene_Battle_TBS < Scene_Base
           $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].change_equip_by_id(match[1].to_i, match[2].to_i)
         end
       #---
-      end
     } # self.note.split
     
     # get weapon, armour tags from original enemy
