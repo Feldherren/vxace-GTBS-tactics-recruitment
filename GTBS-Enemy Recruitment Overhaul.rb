@@ -1,9 +1,12 @@
+# Overhauls enemy capture and invite in GTBS to create clone actors, using Fomar's Clone Actor script, instead, hence allowing the recruitment of unlimited generics.
+# Recruited units retain their name (so the base actor can have something purely descriptive), level and can be given initial equipment via notebox tags.
+
 module Recruitment
   # Variable to store ID of new clone in whilst it's customised.
   NEW_ACTOR_VAR = 1
   
-  MATCH_EQUIP = /(<recruit\s*equipment\s*:\s*\d*,\s*\d*>),?+/i
-  MATCH_PARAMS = /^<recruit (MHP|MMP|ATK|DEF|MAT|MDF|AGI|LUK)\s*:\s*(\+|\-)\s*([\d]*)>/i
+  MATCH_EQUIP = /(<recruit equipment:\s*\d*,\s*\d*>),?+/i
+  MATCH_PARAMS = /(<recruit \w\w\w:\s*[\+\-]\s*\d*>)/i
 end
 
 class Scene_Battle_TBS < Scene_Base
@@ -45,7 +48,7 @@ class Scene_Battle_TBS < Scene_Base
     if (equip_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_EQUIP))
       $i = 0
       while $i < equip_tags.length do
-        match = equip_tags[$i].to_s.match( /<recruit\s*equipment\s*:\s*(\d*),\s*(\d*)>,?+/i )
+        match = equip_tags[$i].to_s.match( /<recruit\s*equipment\s*:\s*(\d*),\s*(\d*)>/i )
         if match[0].to_i == 0
           # equipment is a weapon
           $game_party.gain_item($data_weapons[match[1].to_i], 1)
@@ -58,6 +61,18 @@ class Scene_Battle_TBS < Scene_Base
         $i += 1
       end
     end
-    # get stat tags from original enemy
+    if (param_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_PARAM))
+      $i = 0
+      while $i < param_tags.length do
+        if (match = param_tags[$i].to_s.match( /<recruit (MHP|MMP|ATK|DEF|MAT|MDF|AGI|LUK)\s*:\s*(\+|\-)\s*(\d*)>/i ))
+          $j = 0
+          while $j < match.length do
+            puts match[$j]
+            $j += 1
+          end
+        end
+        $i += 1
+      end
+    end
   end
 end
