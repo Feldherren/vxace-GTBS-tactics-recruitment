@@ -61,14 +61,39 @@ class Scene_Battle_TBS < Scene_Base
         $i += 1
       end
     end
-    if (param_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_PARAM))
+    if (param_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_PARAMS))
       $i = 0
       while $i < param_tags.length do
         if (match = param_tags[$i].to_s.match( /<recruit (MHP|MMP|ATK|DEF|MAT|MDF|AGI|LUK)\s*:\s*(\+|\-)\s*(\d*)>/i ))
-          $j = 0
-          while $j < match.length do
-            puts match[$j]
-            $j += 1
+          #puts "Param: " + match[1] + " " + match[2] + match[3]
+          
+          $paramvalue = match[3].to_i
+          
+          $paramchange = -1
+          if match[1].downcase == "mhp"
+            $paramchange = 0
+          elsif match[1] == "mmp"
+            $paramchange = 1
+          elsif match[1] == "atk"
+            $paramchange = 2
+          elsif match[1] == "def"
+            $paramchange = 3
+          elsif match[1] == "mat"
+            $paramchange = 4
+          elsif match[1] == "mdf"
+            $paramchange = 5
+          elsif match[1] == "agi"
+            $paramchange = 6
+          elsif match[1] == "luk"
+            $paramchange = 7
+          end
+          
+          if match[2] == "-"
+            $paramvalue = $paramvalue * -1
+          end
+          
+          if $paramchange != -1
+            $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].add_param($paramchange, $paramvalue)
           end
         end
         $i += 1
