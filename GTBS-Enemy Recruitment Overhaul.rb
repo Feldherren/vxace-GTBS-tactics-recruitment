@@ -40,8 +40,9 @@ module Recruitment
   # Variable to store ID of new clone in whilst it's customised.
   NEW_ACTOR_VAR = 1
   
-  MATCH_EQUIP = /(<recruit equipment:\s*\d*,\s*\d*>),?+/i
+  MATCH_EQUIPS = /(<recruit equipment:\s*\d*,\s*\d*>),?+/i
   MATCH_PARAMS = /(<recruit \w\w\w:\s*[\+\-]\s*\d*>)/i
+  MATCH_SKILLS = /<recruit skill:\s*(\d*)>/i
 end
 
 class Scene_Battle_TBS < Scene_Base
@@ -79,8 +80,8 @@ class Scene_Battle_TBS < Scene_Base
       currentLevel +=1
     end
     
-    # get weapon, armour tags from original enemy
-    if (equip_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_EQUIP))
+    # Equipment
+    if (equip_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_EQUIPS))
       $i = 0
       while $i < equip_tags.length do
         match = equip_tags[$i].to_s.match( /<recruit\s*equipment\s*:\s*(\d*),\s*(\d*)>/i )
@@ -96,6 +97,8 @@ class Scene_Battle_TBS < Scene_Base
         $i += 1
       end
     end
+    
+    # Parameters
     if (param_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_PARAMS))
       $i = 0
       while $i < param_tags.length do
@@ -131,6 +134,15 @@ class Scene_Battle_TBS < Scene_Base
             $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].add_param($paramchange, $paramvalue)
           end
         end
+        $i += 1
+      end
+    end
+    
+    # Skills
+    if (skill_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_SKILLS))
+      $i = 0
+      while $i < skill_tags.length do
+        $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].learn_skill(skill_tags[$i][0].to_i)
         $i += 1
       end
     end
