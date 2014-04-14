@@ -1,6 +1,17 @@
 =begin
 GTBS Clone Recruitment v1.0, by Feldherren
 
+---------
+Changelog
+---------
+  v1.0 - first released version of script
+  v1.1 - user can now specify skills clone actor will start with. Also, general
+         fixes and tweaks, such as removing test code.
+
+-------
+General
+-------
+
 Requires: GTBS (GubiD), Clone Actors (Fomar)
 
 Overhauls enemy capture and invite in GTBS to create clone actors, using Fomar's
@@ -34,6 +45,11 @@ Parameters:
   [amount] can be either positive or negative.
   When recruited, the resulting clone actor will have the specified bonus or 
   penalty to their stats.
+Skills
+  Add the following tag to the enemy's notebox: <recruit skill: [id]>
+  Valid values for [id] are skill IDs.
+  When recruited, the resulting clone actor will be able to use the specified 
+  skill.
 =end
 
 module Recruitment
@@ -55,9 +71,10 @@ class Scene_Battle_TBS < Scene_Base
       return if id ==0
       #$game_party.add_actor(id)
       # NEW
-      $game_variables[Recruitment::NEW_ACTOR_VAR]=$game_actors[id,true]
+      $new_clone = 0
+      $new_clone=$game_actors[id,true]
       customise_clone(id, battler)
-      $game_party.add_actor($game_variables[Recruitment::NEW_ACTOR_VAR])
+      $game_party.add_actor($new_clone)
       # END NEW STUFF
     elsif (battler.actor? && !battler.death_state? && battler.team != Battler_Actor &&
                                 !battler.states.include?(GTBS::CHARM_ID))
@@ -70,13 +87,13 @@ class Scene_Battle_TBS < Scene_Base
   end
   
   def customise_clone(id, battler)
-    # fix new actor's name
-    $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].name = battler.name()
-    # get enemy level
+    # Name
+    $game_actors[$new_clone].name = battler.name()
+    # Level
     targetLevel = battler.level
-    currentLevel = $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].level
+    currentLevel = $game_actors[$new_clone].level
     while currentLevel < targetLevel  do
-      $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].level_up()
+      $game_actors[$new_clone].level_up()
       currentLevel +=1
     end
     
@@ -93,7 +110,7 @@ class Scene_Battle_TBS < Scene_Base
           $game_party.gain_item($data_armors[match[1].to_i], 1)
         end
         #$game_actors[id].change_equip_by_id(slot_id, item_id) # for changing equipment
-        $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].change_equip_by_id(match[0].to_i, match[1].to_i)
+        $game_actors[$new_clone].change_equip_by_id(match[0].to_i, match[1].to_i)
         $i += 1
       end
     end
@@ -103,7 +120,6 @@ class Scene_Battle_TBS < Scene_Base
       $i = 0
       while $i < param_tags.length do
         if (match = param_tags[$i].to_s.match( /<recruit (MHP|MMP|ATK|DEF|MAT|MDF|AGI|LUK)\s*:\s*(\+|\-)\s*(\d*)>/i ))
-          #puts "Param: " + match[1] + " " + match[2] + match[3]
           
           $paramvalue = match[3].to_i
           
@@ -131,7 +147,7 @@ class Scene_Battle_TBS < Scene_Base
           end
           
           if $paramchange != -1
-            $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].add_param($paramchange, $paramvalue)
+            $game_actors[$new_clone].add_param($paramchange, $paramvalue)
           end
         end
         $i += 1
@@ -142,7 +158,7 @@ class Scene_Battle_TBS < Scene_Base
     if (skill_tags = $data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_SKILLS))
       $i = 0
       while $i < skill_tags.length do
-        $game_actors[$game_variables[Recruitment::NEW_ACTOR_VAR]].learn_skill(skill_tags[$i][0].to_i)
+        $game_actors[$new_clone].learn_skill(skill_tags[$i][0].to_i)
         $i += 1
       end
     end
