@@ -7,6 +7,9 @@ Changelog
   v1.0 - first released version of script
   v1.1 - user can now specify skills clone actor will start with. Also, general
          fixes and tweaks, such as removing test code.
+  v1.2 - user can now specify class clone actor will start with and level as.
+         Also removed a useless thing that was never really used in the first
+         place.
 
 -------
 General
@@ -33,6 +36,12 @@ Set up an enemy as recruitable or capturable as normal in GTBS, and point it
 at the basic actor created above. Optionally also set its level, which will 
 be used by the recruited actor.
   
+Class:
+  Add the following tag to the enemy notebox: <recruit class: [id]>
+  Replace [id] with the ID of the class.
+  When recruited, the resulting clone actor will have the specified class, and 
+  will be levelled as if from level 1 in that class (if you're using Yanfly's 
+  Parameter Bonus Growth script or something similar).
 Equipment:
   Add the following tag to the enemy notebox: <recruit equipment: [slot], [id]>
   Replace [slot] with equipment slot and [id] with the ID of the weapon or 
@@ -53,12 +62,10 @@ Skills
 =end
 
 module Recruitment
-  # Variable to store ID of new clone in whilst it's customised.
-  NEW_ACTOR_VAR = 1
-  
+  MATCH_CLASS = /<recruit class:\s*(\d*)>/i
   MATCH_EQUIPS = /(<recruit equipment:\s*\d*,\s*\d*>),?+/i
   MATCH_PARAMS = /(<recruit \w\w\w:\s*[\+\-]\s*\d*>)/i
-  MATCH_SKILLS = /<recruit skill:\s*(\d*)>/i
+  MATCH_SKILLS = /<recruit skill:\s*(\d*)>/i # note: may only match once per enemy? look into this
 end
 
 class Scene_Battle_TBS < Scene_Base
@@ -89,6 +96,8 @@ class Scene_Battle_TBS < Scene_Base
   def customise_clone(id, battler)
     # Name
     $game_actors[$new_clone].name = battler.name()
+	# Class
+	$game_actors[$new_clone].change_class($data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_CLASS)[0].to_i)
     # Level
     targetLevel = battler.level
     currentLevel = $game_actors[$new_clone].level
