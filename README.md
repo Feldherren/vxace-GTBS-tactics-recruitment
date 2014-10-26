@@ -6,6 +6,9 @@ Changelog
   v1.0 - first released version of script
   v1.1 - user can now specify skills clone actor will start with. Also, general
          fixes and tweaks, such as removing test code.
+  v1.2 - user can now specify class clone actor will start with and level as.
+         Also removed a useless thing that was never really used in the first
+         place.
 
 -------
 General
@@ -27,12 +30,17 @@ Usage
 
 Set up GTBS, and the Clone Actors script
 Place GTBS Clone Recruitment script below GTBS scripts, and above Main.
-Create at least one basic actor from which to make clones; this actor 
-should be whatever class you want the resulting clones to be.
+Create at least one basic actor from which to make clones.
 Set up an enemy as recruitable or capturable as normal in GTBS, and point it 
 at the basic actor created above. Optionally also set its level, which will 
 be used by the recruited actor.
   
+Class:
+  Add the following tag to the enemy notebox: <recruit class: [id]>
+  Replace [id] with the ID of the class.
+  When recruited, the resulting clone actor will have the specified class, and 
+  will be levelled as if from level 1 in that class (if you're using Yanfly's 
+  Parameter Bonus Growth script or something similar).
 Equipment:
   Add the following tag to the enemy notebox: <recruit equipment: [slot], [id]>
   Replace [slot] with equipment slot and [id] with the ID of the weapon or 

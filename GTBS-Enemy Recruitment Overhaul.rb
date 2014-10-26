@@ -30,8 +30,7 @@ Usage
 -----
 Set up GTBS, and the Clone Actors script
 Place GTBS Clone Recruitment script below GTBS scripts, and above Main.
-Create at least one basic actor from which to make clones; this actor 
-should be whatever class you want the resulting clones to be.
+Create at least one basic actor from which to make clones.
 Set up an enemy as recruitable or capturable as normal in GTBS, and point it 
 at the basic actor created above. Optionally also set its level, which will 
 be used by the recruited actor.
@@ -97,7 +96,7 @@ class Scene_Battle_TBS < Scene_Base
     # Name
     $game_actors[$new_clone].name = battler.name()
 	# Class
-	$game_actors[$new_clone].change_class($data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_CLASS)[0].to_i)
+	$game_actors[$new_clone].change_class($data_enemies[battler.enemy_id].note.scan(Recruitment::MATCH_CLASS)[0][0].to_i)
     # Level
     targetLevel = battler.level
     currentLevel = $game_actors[$new_clone].level
