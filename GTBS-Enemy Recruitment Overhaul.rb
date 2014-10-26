@@ -1,5 +1,5 @@
 =begin
-GTBS Clone Recruitment v1.0, by Feldherren
+GTBS Clone Recruitment v1.2, by Feldherren
 
 ---------
 Changelog
